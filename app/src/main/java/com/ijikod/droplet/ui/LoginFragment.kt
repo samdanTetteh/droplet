@@ -13,6 +13,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 import com.ijikod.droplet.Constants
 import com.ijikod.droplet.R
 
@@ -39,8 +40,22 @@ class LoginFragment : Fragment() {
 
         holder = loginView.findViewById(R.id.holder_layout)
 
-        showAuthScreen()
+        loginCheck()
         return loginView
+    }
+
+
+
+    // Check for login instance of current User
+    private fun loginCheck(){
+        val fireBaseAuth = FirebaseAuth.getInstance()
+        if(fireBaseAuth.currentUser != null){
+            //Already signed in
+
+        }else{
+            // not signed in
+            showAuthScreen()
+        }
     }
 
 
@@ -79,7 +94,7 @@ class LoginFragment : Fragment() {
 
             // Successfully signed in
             if (resultCode == Activity.RESULT_OK){
-                
+
                 Log.d("Login", "Success")
             }else{
                 //Sign in failed
