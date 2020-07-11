@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "707184938030",
+    "firebase_url": "https://droplet-beb2d.firebaseio.com",
+    "project_id": "droplet-beb2d",
+    "storage_bucket": "droplet-beb2d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:707184938030:android:7ab650f6cdfb74b98de3bf",
+        "android_client_info": {
+          "package_name": "com.ijikod.droplet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "707184938030-sk3h40lq3v2176tvoouk7sqna08jev6q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ijikod.droplet",
+            "certificate_hash": "bfd8589192324f7079a0d128f6821225a7014359"
+          }
+        },
+        {
+          "client_id": "707184938030-1hs31m1a56ogtbvjg4lcmqh9hkhjg77r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzlqha-Eq7AYm54zlnWDRoWc5-SkDU7cc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "707184938030-1hs31m1a56ogtbvjg4lcmqh9hkhjg77r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

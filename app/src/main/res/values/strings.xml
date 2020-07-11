@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Droplet</string>
+    <string name="uk_ios">gb</string>
+
+    <string name="sign_in_continue">Sign in to continue</string>
+    <string name="network_error">Network Error, please and try again</string>
+    <string name="unknown_error">Unkown Error, try again</string>
+    <string name="droplet_logo_txt">Droplet logo</string>
+    <string name="login_txt">Sign In</string>
+</resources>
