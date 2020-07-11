@@ -7,4 +7,7 @@
     <string name="unknown_error">Unkown Error, try again</string>
     <string name="droplet_logo_txt">Droplet logo</string>
     <string name="login_txt">Sign In</string>
+    <string name="logout_txt">Logout</string>
+    <string name="save_txt">Save</string>
+    <string name="logout_confirm_txt">Are you sure you want to logout?</string>
 </resources>

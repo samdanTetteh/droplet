@@ -1,12 +1,12 @@
 package com.ijikod.droplet.ui
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import com.firebase.ui.auth.AuthUI
@@ -29,6 +29,7 @@ class LoginFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -114,6 +115,52 @@ class LoginFragment : Fragment() {
                 showSnackBar(getString(R.string.unknown_error), getString(R.string.login_txt))
             }
         }
+    }
+
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.main_menu, menu)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val itemId = item.itemId
+
+        // Sign out user
+        if (itemId == R.id.sign_out){
+            val alertBuilder : AlertDialog.Builder = AlertDialog.Builder(requireContext())
+            with(alertBuilder){
+                setTitle(getString(R.string.app_name))
+                setMessage(getString(R.string.logout_confirm_txt))
+                setCancelable(false)
+
+                setPositiveButton(getString(R.string.logout_txt)) { _, _ ->
+                    AuthUI.getInstance().signOut(requireContext()).addOnCompleteListener {
+                        requireActivity().finish()
+                    }
+                }
+
+                setNegativeButton(getString(android.R.string.cancel)) { _, _ ->
+                    create().hide()
+                }
+
+            }
+
+            //Show only once instance of logout dialog
+            val alertDialog : AlertDialog = alertBuilder.create()
+            if (!alertDialog.isShowing) alertDialog.show()
+
+
+
+        }
+
+        // Save user details
+        if (itemId == R.id.save){
+
+
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
 
