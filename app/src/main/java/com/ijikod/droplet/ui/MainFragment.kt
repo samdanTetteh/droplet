@@ -2,6 +2,7 @@ package com.ijikod.droplet.ui
 
 import android.Manifest
 import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Intent
@@ -18,23 +19,22 @@ import android.widget.ScrollView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.PERMISSION_DENIED
 import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-import com.ijikod.droplet.Interface.UserDataView
-import com.ijikod.droplet.Utils
+import com.ijikod.droplet.Interface.UserView
 import com.ijikod.droplet.R
+import com.ijikod.droplet.Utils
 import com.ijikod.droplet.model.User
 import com.ijikod.droplet.viewmodel.UserViewModel
-import com.squareup.picasso.Picasso
+import com.theartofdev.edmodo.cropper.CropImage
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.context.stopKoin
 
 
 /**
@@ -42,25 +42,34 @@ import org.koin.core.context.stopKoin
  * Use the [MainFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class MainFragment : Fragment(), UserDataView {
+class MainFragment : Fragment(), UserView {
 
-    lateinit var holder : CoordinatorLayout
-    lateinit var detailsHolder :  ScrollView
-    lateinit var splashView : ConstraintLayout
+    lateinit var holder: CoordinatorLayout
+    lateinit var detailsHolder: ScrollView
+    lateinit var splashView: ConstraintLayout
     lateinit var imageView: ImageView
     lateinit var firstNameTxt: EditText
-    lateinit var lastNameTxt : EditText
-    lateinit var emailTxt : EditText
+    lateinit var lastNameTxt: EditText
+    lateinit var emailTxt: EditText
 
     var imageUri: Uri? = null
-    var signedInPhoneNumber : String? = null
+    var signedInPhoneNumber: String? = null
     var signedInUserImage = ""
 
     val mUserViewModel: UserViewModel by viewModel()
 
+    companion object {
+        fun newInstance() = MainFragment()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        loginCheck()
     }
 
     override fun onCreateView(
@@ -68,18 +77,16 @@ class MainFragment : Fragment(), UserDataView {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val loginView =  inflater.inflate(R.layout.fragment_login, container, false)
+        val loginView = inflater.inflate(R.layout.fragment_login, container, false)
 
         initScreen(loginView)
-
-        loginCheck()
 
         mUserViewModel.attachView(this, this)
         return loginView
     }
 
     //Initialise views
-    private fun initScreen(view: View){
+    private fun initScreen(view: View) {
         holder = view.findViewById(R.id.holder_layout)
         detailsHolder = view.findViewById(R.id.app_view_scroll)
         imageView = view.findViewById(R.id.profile_img)
@@ -95,36 +102,39 @@ class MainFragment : Fragment(), UserDataView {
     }
 
     // Check for login instance of current User
-    private fun loginCheck(){
+    private fun loginCheck() {
         val fireBaseAuth = FirebaseAuth.getInstance()
         val firebaseUser = fireBaseAuth.currentUser
-        if(firebaseUser != null){
+        if (firebaseUser != null) {
             //Already signed in
-            Utils.getInstance(requireContext()).show()
+            Utils.getLoadingInstance(requireContext()).show()
             signedInPhoneNumber = firebaseUser.phoneNumber
             signedInPhoneNumber?.let { mUserViewModel.getProfile(it) }
             showDetailsPage()
-        }else{
+        } else {
             // not signed in
             showAuthScreen()
         }
     }
 
-    private fun showAuthScreen(){
+    private fun showAuthScreen() {
         //setting default country code
-        val authProvider = AuthUI.IdpConfig.PhoneBuilder().setDefaultCountryIso(getString(R.string.uk_ios))
+        val authProvider =
+            AuthUI.IdpConfig.PhoneBuilder().setDefaultCountryIso(getString(R.string.uk_ios))
 
         startActivityForResult(
             // Get an instance of AuthUI based on the default app
             AuthUI.getInstance().createSignInIntentBuilder()
-                .setAvailableProviders(arrayListOf(
-                    authProvider.build()
-                )).build(), Utils.RC_SIGN_IN
+                .setAvailableProviders(
+                    arrayListOf(
+                        authProvider.build()
+                    )
+                ).build(), Utils.RC_SIGN_IN
         );
     }
 
     // show error message in snackbar
-    private fun showSnackBar(msg: String, actionMsg: String){
+    private fun showSnackBar(msg: String, actionMsg: String) {
         val snackbar = Snackbar
             .make(holder, msg, Snackbar.LENGTH_INDEFINITE)
             .setAction(actionMsg) {
@@ -134,20 +144,22 @@ class MainFragment : Fragment(), UserDataView {
     }
 
     //check runtime permission and show gallery
-    private fun showGallery(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if (checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PERMISSION_DENIED){
+    private fun showGallery() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(
+                    requireActivity(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PERMISSION_DENIED
+            ) {
                 //permission denied
                 val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE);
                 //show popup to request runtime permission
                 requestPermissions(permissions, Utils.IMAGE_PERMISSION_CODE);
-            }
-            else{
+            } else {
                 //permission already granted
                 pickImageFromGallery();
             }
-        }
-        else{
+        } else {
             //system OS is < Marshmallow
             pickImageFromGallery();
         }
@@ -157,27 +169,32 @@ class MainFragment : Fragment(), UserDataView {
     private fun pickImageFromGallery() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
+        intent.putExtra("crop", "true")
         startActivityForResult(intent, Utils.IMAGE_PICK_CODE)
     }
 
     //check runtime permission and capture image
-    private fun showCamera(){
+    private fun showCamera() {
         //if system os is Marshmallow or Above, we need to request runtime permission
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if (checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PERMISSION_DENIED ||
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.CAMERA
+                ) == PERMISSION_DENIED ||
                 checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PERMISSION_DENIED){
+                == PERMISSION_DENIED
+            ) {
                 //permission was not enabled
-                val permission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                val permission =
+                    arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 //show popup to request permission
                 requestPermissions(permission, Utils.CAPTURE_PERMISSION_CODE)
-            } else{
+            } else {
                 //permission already granted
 
                 openCamera()
             }
-        }
-        else{
+        } else {
             //system os is < marshmallow
             openCamera()
         }
@@ -188,10 +205,14 @@ class MainFragment : Fragment(), UserDataView {
         val values = ContentValues()
         values.put(MediaStore.Images.Media.TITLE, getString(R.string.new_picture))
         values.put(MediaStore.Images.Media.DESCRIPTION, getString(R.string.from_camera_txt))
-        imageUri = requireActivity().contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        imageUri = requireActivity().contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            values
+        )
         //camera intent
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+        cameraIntent.putExtra("crop", "true")
         startActivityForResult(cameraIntent, Utils.IMAGE_CAPTURE_CODE)
     }
 
@@ -199,11 +220,11 @@ class MainFragment : Fragment(), UserDataView {
         super.onActivityResult(requestCode, resultCode, data)
 
         // checking for reponses from sign auth in fragment
-        if (requestCode == Utils.RC_SIGN_IN){
+        if (requestCode == Utils.RC_SIGN_IN) {
             val response = IdpResponse.fromResultIntent(data)
 
             // Successfully signed in
-            if (resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 //Store user phone number after successful sign in
                 response?.phoneNumber.let {
                     signedInPhoneNumber = it
@@ -212,15 +233,18 @@ class MainFragment : Fragment(), UserDataView {
 
                 showDetailsPage()
                 Log.d("Login", "Success")
-            }else{
+            } else {
                 //Sign in failed
-                if (response == null){
+                if (response == null) {
                     // User Pressed back button
-                    showSnackBar(getString(R.string.sign_in_continue), getString(R.string.login_txt))
+                    showSnackBar(
+                        getString(R.string.sign_in_continue),
+                        getString(R.string.login_txt)
+                    )
                     return
                 }
 
-                if (response.error?.errorCode == ErrorCodes.NO_NETWORK){
+                if (response.error?.errorCode == ErrorCodes.NO_NETWORK) {
                     // Network Error
                     return
                 }
@@ -231,21 +255,32 @@ class MainFragment : Fragment(), UserDataView {
         }
 
         // Proccess selected image from image gallery
-        if (requestCode == Utils.IMAGE_PICK_CODE){
-
-            if (resultCode == Activity.RESULT_OK){
-                imageUri = data?.data
-                Picasso.get().load(imageUri).rotate(90f).into(imageView)
+        if (requestCode == Utils.IMAGE_PICK_CODE) {
+            if (data == null || data.data == null) {
+                return
+            }
+            CropImage.activity(data.data!!).start(requireActivity(), this);
+        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            val result = CropImage.getActivityResult(data)
+            if (resultCode == Activity.RESULT_OK) {
+                imageUri = result.uri
+                Glide.with(this).load(imageUri).circleCrop().into(imageView)
             }
 
         }
 
         //Process image from camera
-        if (requestCode == Utils.IMAGE_CAPTURE_CODE){
-
-            if (resultCode == Activity.RESULT_OK){
+        if (requestCode == Utils.IMAGE_CAPTURE_CODE) {
+            if (imageUri == null || imageUri == null) {
+                return
+            }
+            CropImage.activity(imageUri).start(requireActivity(), this);
+        } else if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+            val result = CropImage.getActivityResult(data)
+            if (resultCode == Activity.RESULT_OK) {
                 //set image captured to image view
-                Picasso.get().load(imageUri).rotate(90f).into(imageView)
+                imageUri = result.uri
+                Glide.with(this).load(imageUri).circleCrop().into(imageView)
             }
         }
     }
@@ -355,14 +390,14 @@ class MainFragment : Fragment(), UserDataView {
         // Save user details
         if (itemId == R.id.save){
             if (Utils.validatePage(firstName = firstNameTxt, lastName = lastNameTxt, email = emailTxt)){
-                Utils.getInstance(requireContext()).show()
+                Utils.getLoadingInstance(requireContext()).show()
                 if (imageUri == null){
                     val user = User(firstName = firstNameTxt.text.toString())
                     user.lastName = lastNameTxt.text.toString().trim()
                     user.email = emailTxt.text.toString().trim()
                     user.phoneNumber = signedInPhoneNumber
                     user.image = signedInUserImage
-                    mUserViewModel.saveProfile(user)
+                    mUserViewModel.saveUser(user)
                 }else{
                     imageUri?.let {
                         mUserViewModel.saveUserImage(it)
@@ -374,18 +409,18 @@ class MainFragment : Fragment(), UserDataView {
     }
 
     override fun onUserSaved(success: Boolean) {
-        Utils.getInstance(requireContext()).hide()
+        Utils.getLoadingInstance(requireContext()).hide()
     }
 
     override fun onUser(user: User?) {
-        Utils.getInstance(requireContext()).hide()
+        Utils.getLoadingInstance(requireContext()).hide()
         user?.let {
             firstNameTxt.setText(it.firstName)
             lastNameTxt.setText(it.lastName)
             emailTxt.setText(it.email)
             signedInUserImage = it.image.toString()
             if (!it.image?.isEmpty()!!)
-                Picasso.get().load(it.image).rotate(90f).placeholder(R.drawable.ic_account_circle).into(imageView)
+                Glide.with(this).load(it.image).placeholder(R.drawable.ic_account_circle).circleCrop().into(imageView)
         }
     }
 
@@ -396,7 +431,7 @@ class MainFragment : Fragment(), UserDataView {
         user.email = emailTxt.text.toString().trim()
         user.phoneNumber = signedInPhoneNumber
         user.image = image
-        mUserViewModel.saveProfile(user)
+        mUserViewModel.saveUser(user)
     }
 
 }

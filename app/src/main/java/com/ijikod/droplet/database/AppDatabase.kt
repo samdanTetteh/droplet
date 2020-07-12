@@ -1,8 +1,6 @@
 package com.ijikod.droplet.database
 
 import android.net.Uri
-import android.system.Os.close
-import android.widget.Toast
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DataSnapshot
@@ -10,7 +8,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.ijikod.droplet.model.User
 import java.util.*
@@ -40,6 +37,7 @@ class AppDatabase private constructor(){
         }
     }
 
+    //save user
     fun saveUser(user: User, onSuccess: ((Boolean) -> Unit)? = null) {
         user.phoneNumber?.let {
             userNode.child(it).setValue(user)
@@ -50,6 +48,7 @@ class AppDatabase private constructor(){
     }
 
 
+    //save user Image
     fun saveUserImage(imageUri: Uri, onSuccess: ((String) -> Unit)? = null) {
                 val ref = storageReference.child("uploads/" + UUID.randomUUID().toString())
                 val uploadTask = ref.putFile(imageUri)

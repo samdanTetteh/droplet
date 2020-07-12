@@ -13,7 +13,6 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         //Language configuration for firebase UI
@@ -46,21 +45,28 @@ dependencies {
     // FirebaseUI for Firebase Auth
     implementation 'com.firebaseui:firebase-ui-auth:6.2.1'
 
-
     // Navigation
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-ui:$nav_version"
 
     // image processing
-    implementation "com.squareup.picasso:picasso:2.71828"
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
     // Firebase
     implementation 'com.google.firebase:firebase-database-ktx:19.3.1'
 
     // Koin for Android Architecture ViewModel
     implementation 'org.koin:koin-androidx-viewmodel:2.0.1'
+    testImplementation 'org.koin:koin-test:2.0.1'
+
+    // For activity rules
+    androidTestImplementation 'androidx.test:rules:1.2.0'
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.1.0'
+
+    // Image Cropper
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
 
 }

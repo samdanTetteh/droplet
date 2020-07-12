@@ -28,7 +28,6 @@ class DropletApp : Application(){
             single {
                 UserRepository.getInstance()
             }
-
         }
 
         // start Koin!

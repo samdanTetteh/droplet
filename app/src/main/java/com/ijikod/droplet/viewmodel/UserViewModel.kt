@@ -4,12 +4,12 @@ import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.ijikod.droplet.Interface.UserDataView
+import com.ijikod.droplet.Interface.UserView
 import com.ijikod.droplet.base.BaseViewModel
 import com.ijikod.droplet.model.User
 import com.ijikod.droplet.repository.UserRepository
 
-class UserViewModel(private val mProfileRepository: UserRepository) :  BaseViewModel<UserDataView>() {
+class UserViewModel(private val mProfileRepository: UserRepository) :  BaseViewModel<UserView>() {
 
 
     private val mMutableUserData = MutableLiveData<User?>()
@@ -31,7 +31,7 @@ class UserViewModel(private val mProfileRepository: UserRepository) :  BaseViewM
         }
     }
 
-    fun saveProfile(user: User) {
+    fun saveUser(user: User) {
         mProfileRepository.saveUserData(user) {
             mProfileUserSaved.postValue(it)
         }
@@ -45,7 +45,7 @@ class UserViewModel(private val mProfileRepository: UserRepository) :  BaseViewM
 
     }
 
-    override fun attachView(view: UserDataView, lifecycleOwner: LifecycleOwner) {
+    override fun attachView(view: UserView, lifecycleOwner: LifecycleOwner) {
         super.attachView(view, lifecycleOwner)
 
         mMutableUserData.observe(lifecycleOwner, mUserObserver)

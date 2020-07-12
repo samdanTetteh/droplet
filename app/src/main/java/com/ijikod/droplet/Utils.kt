@@ -57,7 +57,7 @@ class Utils {
         }
 
         //loading dialog view
-            fun getInstance(context: Context): Dialog {
+            fun getLoadingInstance(context: Context): Dialog {
                 if (dialog == null)
                     dialog = Dialog(context)
                 val inflate = LayoutInflater.from(context).inflate(R.layout.progress_layout, null)
