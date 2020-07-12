@@ -10,4 +10,18 @@
     <string name="logout_txt">Logout</string>
     <string name="save_txt">Save</string>
     <string name="logout_confirm_txt">Are you sure you want to logout?</string>
+    <string name="profile_txt">profile</string>
+    <string name="first_name_hint_txt">First Name</string>
+    <string name="last_name_txt">Last Name</string>
+    <string name="email_txt">Email</string>
+    <string name="perms_denied_txt">Permission denied</string>
+    <string name="first_name_txt">Enter First Name</string>
+    <string name="enter_last_name">Enter Last Name</string>
+    <string name="valid_email_txt">Enter valid Email</string>
+    <string name="edit_image_txt">Edit Image</string>
+    <string name="camera_txt">Camera</string>
+    <string name="select_image_txt">Select Image</string>
+    <string name="new_picture">New Picture</string>
+    <string name="from_camera_txt">From the Camera</string>
+    <string name="view_null_exception">View is null please call attach method</string>
 </resources>

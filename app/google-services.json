@@ -8,18 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:707184938030:android:7ab650f6cdfb74b98de3bf",
+        "mobilesdk_app_id": "1:707184938030:android:01efee1c52a8058e8de3bf",
         "android_client_info": {
           "package_name": "com.ijikod.droplet"
         }
       },
       "oauth_client": [
         {
-          "client_id": "707184938030-sk3h40lq3v2176tvoouk7sqna08jev6q.apps.googleusercontent.com",
+          "client_id": "707184938030-q3fg9c0dvgqvpd0mu3v7472mfr0tbcda.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.ijikod.droplet",
-            "certificate_hash": "bfd8589192324f7079a0d128f6821225a7014359"
+            "certificate_hash": "e08582a1cf96ea8fd7f90ad0aa3b016c50db2d47"
           }
         },
         {
