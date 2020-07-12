@@ -105,11 +105,15 @@ class MainFragment : Fragment(), UserView {
         val fireBaseAuth = FirebaseAuth.getInstance()
         val firebaseUser = fireBaseAuth.currentUser
         if (firebaseUser != null) {
-            //Already signed in
-            Utils.getLoadingInstance(requireContext()).show()
-            signedInPhoneNumber = firebaseUser.phoneNumber
-            signedInPhoneNumber?.let { mUserViewModel.getProfile(it) }
-            showDetailsPage()
+            if (Utils.isNetworkAvailable()){
+                //Already signed in
+                Utils.getLoadingInstance(requireContext()).show()
+                signedInPhoneNumber = firebaseUser.phoneNumber
+                signedInPhoneNumber?.let { mUserViewModel.getProfile(it) }
+                showDetailsPage()
+            }else {
+                Toast.makeText(requireContext(), getString(R.string.connection_txt), Toast.LENGTH_LONG).show()
+            }
         } else {
             // not signed in
             showAuthScreen()
@@ -291,7 +295,7 @@ class MainFragment : Fragment(), UserView {
         builder.setTitle(getString(R.string.edit_image_txt))
 
         val options = arrayOf(getString(R.string.camera_txt), getString(R.string.select_image_txt))
-        builder.setItems(options) { dialog, which ->
+        builder.setItems(options) { _, which ->
             when (which) {
                 0 -> {
                     showCamera()

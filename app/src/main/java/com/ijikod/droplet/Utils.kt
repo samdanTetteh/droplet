@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.ConnectivityManager
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.widget.EditText
@@ -65,6 +66,14 @@ class Utils {
                 ColorDrawable(Color.TRANSPARENT)
             )
             return dialog!!
+        }
+
+        // Check for active network
+        @Suppress("DEPRECATION")
+         fun isNetworkAvailable() : Boolean{
+            val connectivityManager = DropletApp.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo = connectivityManager.activeNetworkInfo
+            return networkInfo?.isConnectedOrConnecting ?: false
         }
 
 
