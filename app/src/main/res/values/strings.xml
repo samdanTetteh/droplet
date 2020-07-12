@@ -24,4 +24,5 @@
     <string name="new_picture">New Picture</string>
     <string name="from_camera_txt">From the Camera</string>
     <string name="view_null_exception">View is null please call attach method</string>
+    <string name="loading_txt">Loading...</string>
 </resources>

@@ -18,6 +18,8 @@ import android.widget.ScrollView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.PermissionChecker
+import androidx.core.content.PermissionChecker.PERMISSION_DENIED
 import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.fragment.app.Fragment
 import com.firebase.ui.auth.AuthUI
@@ -98,6 +100,7 @@ class MainFragment : Fragment(), UserDataView {
         val firebaseUser = fireBaseAuth.currentUser
         if(firebaseUser != null){
             //Already signed in
+            Utils.getInstance(requireContext()).show()
             signedInPhoneNumber = firebaseUser.phoneNumber
             signedInPhoneNumber?.let { mUserViewModel.getProfile(it) }
             showDetailsPage()
@@ -133,7 +136,7 @@ class MainFragment : Fragment(), UserDataView {
     //check runtime permission and show gallery
     private fun showGallery(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if (checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+            if (checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PERMISSION_DENIED){
                 //permission denied
                 val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE);
                 //show popup to request runtime permission
@@ -161,9 +164,9 @@ class MainFragment : Fragment(), UserDataView {
     private fun showCamera(){
         //if system os is Marshmallow or Above, we need to request runtime permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            if (checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
+            if (checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PERMISSION_DENIED ||
                 checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_DENIED){
+                == PERMISSION_DENIED){
                 //permission was not enabled
                 val permission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 //show popup to request permission
@@ -352,6 +355,7 @@ class MainFragment : Fragment(), UserDataView {
         // Save user details
         if (itemId == R.id.save){
             if (Utils.validatePage(firstName = firstNameTxt, lastName = lastNameTxt, email = emailTxt)){
+                Utils.getInstance(requireContext()).show()
                 if (imageUri == null){
                     val user = User(firstName = firstNameTxt.text.toString())
                     user.lastName = lastNameTxt.text.toString().trim()
@@ -370,12 +374,12 @@ class MainFragment : Fragment(), UserDataView {
     }
 
     override fun onUserSaved(success: Boolean) {
-
+        Utils.getInstance(requireContext()).hide()
     }
 
     override fun onUser(user: User?) {
+        Utils.getInstance(requireContext()).hide()
         user?.let {
-            Log.d("Profile Name", it.firstName)
             firstNameTxt.setText(it.firstName)
             lastNameTxt.setText(it.lastName)
             emailTxt.setText(it.email)
