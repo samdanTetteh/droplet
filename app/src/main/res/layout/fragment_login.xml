@@ -12,7 +12,7 @@
         android:id="@+id/splash_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <ImageView
             android:id="@+id/imageView"
@@ -32,7 +32,7 @@
         android:id="@+id/app_view_scroll"
         android:layout_width="match_parent"
         android:fillViewport="true"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -54,6 +54,7 @@ class MainFragment : Fragment(), UserView {
     var imageUri: Uri? = null
     var signedInPhoneNumber: String? = null
     var signedInUserImage = ""
+    var menu : Menu? = null
 
     val mUserViewModel: UserViewModel by viewModel()
 
@@ -312,12 +313,26 @@ class MainFragment : Fragment(), UserView {
     }
 
     private fun showDetailsPage() {
+        menu?.let {
+            val logoutItem  = it.findItem(R.id.sign_out)
+            val saveItem  = it.findItem(R.id.save)
+            logoutItem.isVisible = true
+            saveItem.isVisible = true
+        }
+
         detailsHolder.visibility = View.VISIBLE
         splashView.visibility = View.GONE
     }
 
 
     private fun showSplashPage() {
+        menu?.let {
+            val logoutItem  = it.findItem(R.id.sign_out)
+            val saveItem  = it.findItem(R.id.save)
+            logoutItem.isVisible = false
+            saveItem.isVisible = false
+        }
+
         detailsHolder.visibility = View.GONE
         splashView.visibility = View.VISIBLE
     }
@@ -370,6 +385,7 @@ class MainFragment : Fragment(), UserView {
 
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        this.menu = menu
         inflater.inflate(R.menu.main_menu, menu)
     }
 
@@ -387,7 +403,8 @@ class MainFragment : Fragment(), UserView {
 
                 setPositiveButton(getString(R.string.logout_txt)) { _, _ ->
                     AuthUI.getInstance().signOut(requireContext()).addOnCompleteListener {
-                        requireActivity().finish()
+                        showSplashPage()
+                        loginCheck()
                     }
                 }
 
