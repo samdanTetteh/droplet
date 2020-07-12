@@ -16,3 +16,8 @@ Droplet Development Task
 ## Testing
 *   Android UI tests with [Espresso](https://developer.android.com/training/testing/espresso)
 
+
+## DropBox
+Find below dropBox link to release apk file to install since the SHA-1 on firebase is tagged to my release keystore
+[Droplet App](https://www.dropbox.com/s/j7av6u3xdyp7llb/app-release.apk?dl=0)
+
