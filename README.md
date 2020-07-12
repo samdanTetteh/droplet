@@ -19,5 +19,5 @@ Droplet Development Task
 
 ## DropBox
 Find below dropBox link to release apk file to install since the SHA-1 on firebase is tagged to my release keystore
-[Droplet App](https://www.dropbox.com/s/gs3hnykx5f1u31y/app-release.apk?dl=0)
+[Droplet App](https://www.dropbox.com/s/iwzd0i1960bcv2j/app-release.apk?dl=0)
 
