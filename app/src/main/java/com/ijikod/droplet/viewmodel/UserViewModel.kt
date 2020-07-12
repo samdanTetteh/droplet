@@ -9,7 +9,7 @@ import com.ijikod.droplet.base.BaseViewModel
 import com.ijikod.droplet.model.User
 import com.ijikod.droplet.repository.UserRepository
 
-class UserViewModel(private val mProfileRepository: UserRepository) :  BaseViewModel<UserView>() {
+class UserViewModel(private val mProfileRepository: UserRepository) : BaseViewModel<UserView>() {
 
 
     private val mMutableUserData = MutableLiveData<User?>()
@@ -21,7 +21,7 @@ class UserViewModel(private val mProfileRepository: UserRepository) :  BaseViewM
     private val mUserDataUpdateObserver: Observer<in Boolean> = Observer {
         getView().onUserSaved(it)
     }
-    private val mUserImageUploadObserver : Observer<in String> = Observer {
+    private val mUserImageUploadObserver: Observer<in String> = Observer {
         getView().onUserImageSaved(it)
     }
 
@@ -38,8 +38,8 @@ class UserViewModel(private val mProfileRepository: UserRepository) :  BaseViewM
     }
 
 
-    fun saveUserImage(imageUri: Uri){
-        mProfileRepository.saveUserImage(imageUri){
+    fun saveUserImage(imageUri: Uri) {
+        mProfileRepository.saveUserImage(imageUri) {
             mUserImageSaved.postValue(it)
         }
 

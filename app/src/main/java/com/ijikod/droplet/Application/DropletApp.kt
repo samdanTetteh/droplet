@@ -10,14 +10,16 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 
-class DropletApp : Application(){
-
+/**
+ * Custom application class for DI
+ * **/
+class DropletApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
         appContext = applicationContext
 
-       initKoin()
+        initKoin()
     }
 
     private fun initKoin() {
@@ -43,7 +45,6 @@ class DropletApp : Application(){
 
     companion object {
         lateinit var appContext: Context
-
     }
 
     override fun onTerminate() {

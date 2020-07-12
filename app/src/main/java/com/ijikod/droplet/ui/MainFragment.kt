@@ -2,7 +2,6 @@ package com.ijikod.droplet.ui
 
 import android.Manifest
 import android.app.Activity
-import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Intent
@@ -275,7 +274,7 @@ class MainFragment : Fragment(), UserView {
                 return
             }
             CropImage.activity(imageUri).start(requireActivity(), this);
-        } else if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             val result = CropImage.getActivityResult(data)
             if (resultCode == Activity.RESULT_OK) {
                 //set image captured to image view
@@ -286,7 +285,7 @@ class MainFragment : Fragment(), UserView {
     }
 
     // Edit image selection
-    private fun showCaptureSelection(){
+    private fun showCaptureSelection() {
         // setup the alert builder
         val builder = AlertDialog.Builder(context)
         builder.setTitle(getString(R.string.edit_image_txt))
@@ -294,8 +293,12 @@ class MainFragment : Fragment(), UserView {
         val options = arrayOf(getString(R.string.camera_txt), getString(R.string.select_image_txt))
         builder.setItems(options) { dialog, which ->
             when (which) {
-                0 -> { showCamera()}
-                1 -> { showGallery()}
+                0 -> {
+                    showCamera()
+                }
+                1 -> {
+                    showGallery()
+                }
             }
         }
 
@@ -304,13 +307,13 @@ class MainFragment : Fragment(), UserView {
         dialog.show()
     }
 
-    private fun showDetailsPage(){
+    private fun showDetailsPage() {
         detailsHolder.visibility = View.VISIBLE
         splashView.visibility = View.GONE
     }
 
 
-    private fun showSplashPage(){
+    private fun showSplashPage() {
         detailsHolder.visibility = View.GONE
         splashView.visibility = View.VISIBLE
     }
@@ -322,31 +325,39 @@ class MainFragment : Fragment(), UserView {
     ) {
 
         // Check grant status on gallery access permission
-        when(requestCode){
+        when (requestCode) {
             Utils.IMAGE_PERMISSION_CODE -> {
-                if (grantResults.size >0 && grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED){
+                if (grantResults.size > 0 && grantResults[0] ==
+                    PackageManager.PERMISSION_GRANTED
+                ) {
                     //permission from popup granted
                     pickImageFromGallery()
-                }
-                else{
+                } else {
                     //permission from popup denied
-                    Toast.makeText(requireContext(), getString(R.string.perms_denied_txt), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.perms_denied_txt),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
 
         // Check grant status on camera permission
-        when(requestCode){
+        when (requestCode) {
             Utils.CAPTURE_PERMISSION_CODE -> {
                 if (grantResults.size > 0 && grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED){
+                    PackageManager.PERMISSION_GRANTED
+                ) {
                     //permission from popup was granted
                     openCamera()
-                }
-                else{
+                } else {
                     //permission from popup was denied
-                    Toast.makeText(requireContext(), getString(R.string.perms_denied_txt), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.perms_denied_txt),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -363,9 +374,9 @@ class MainFragment : Fragment(), UserView {
         val itemId = item.itemId
 
         // Sign out user
-        if (itemId == R.id.sign_out){
-            val alertBuilder : AlertDialog.Builder = AlertDialog.Builder(requireContext())
-            with(alertBuilder){
+        if (itemId == R.id.sign_out) {
+            val alertBuilder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+            with(alertBuilder) {
                 setTitle(getString(R.string.app_name))
                 setMessage(getString(R.string.logout_confirm_txt))
                 setCancelable(false)
@@ -383,22 +394,27 @@ class MainFragment : Fragment(), UserView {
             }
 
             //Show only once instance of logout dialog
-            val alertDialog : AlertDialog = alertBuilder.create()
+            val alertDialog: AlertDialog = alertBuilder.create()
             if (!alertDialog.isShowing) alertDialog.show()
         }
 
         // Save user details
-        if (itemId == R.id.save){
-            if (Utils.validatePage(firstName = firstNameTxt, lastName = lastNameTxt, email = emailTxt)){
+        if (itemId == R.id.save) {
+            if (Utils.validatePage(
+                    firstName = firstNameTxt,
+                    lastName = lastNameTxt,
+                    email = emailTxt
+                )
+            ) {
                 Utils.getLoadingInstance(requireContext()).show()
-                if (imageUri == null){
+                if (imageUri == null) {
                     val user = User(firstName = firstNameTxt.text.toString())
                     user.lastName = lastNameTxt.text.toString().trim()
                     user.email = emailTxt.text.toString().trim()
                     user.phoneNumber = signedInPhoneNumber
                     user.image = signedInUserImage
                     mUserViewModel.saveUser(user)
-                }else{
+                } else {
                     imageUri?.let {
                         mUserViewModel.saveUserImage(it)
                     }
@@ -420,7 +436,8 @@ class MainFragment : Fragment(), UserView {
             emailTxt.setText(it.email)
             signedInUserImage = it.image.toString()
             if (!it.image?.isEmpty()!!)
-                Glide.with(this).load(it.image).placeholder(R.drawable.ic_account_circle).circleCrop().into(imageView)
+                Glide.with(this).load(it.image).placeholder(R.drawable.ic_account_circle)
+                    .circleCrop().into(imageView)
         }
     }
 

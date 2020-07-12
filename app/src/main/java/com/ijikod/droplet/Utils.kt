@@ -1,6 +1,5 @@
 package com.ijikod.droplet
 
-import android.app.Application
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
@@ -9,7 +8,6 @@ import android.util.Patterns
 import android.view.LayoutInflater
 import android.widget.EditText
 import com.ijikod.droplet.Application.DropletApp
-import com.ijikod.droplet.database.AppDatabase
 
 /**
  * Utilities
@@ -57,21 +55,20 @@ class Utils {
         }
 
         //loading dialog view
-            fun getLoadingInstance(context: Context): Dialog {
-                if (dialog == null)
-                    dialog = Dialog(context)
-                val inflate = LayoutInflater.from(context).inflate(R.layout.progress_layout, null)
-                dialog!!.setContentView(inflate)
-                dialog!!.setCancelable(false)
-                dialog!!.window!!.setBackgroundDrawable(
-                    ColorDrawable(Color.TRANSPARENT)
-                )
-                return dialog!!
-            }
+        fun getLoadingInstance(context: Context): Dialog {
+            if (dialog == null)
+                dialog = Dialog(context)
+            val inflate = LayoutInflater.from(context).inflate(R.layout.progress_layout, null)
+            dialog!!.setContentView(inflate)
+            dialog!!.setCancelable(false)
+            dialog!!.window!!.setBackgroundDrawable(
+                ColorDrawable(Color.TRANSPARENT)
+            )
+            return dialog!!
+        }
 
 
     }
-
 
 
 }

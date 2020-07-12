@@ -12,16 +12,15 @@ import com.google.firebase.storage.UploadTask
 import com.ijikod.droplet.model.User
 import java.util.*
 
-class AppDatabase private constructor(){
+class AppDatabase private constructor() {
 
-    private val database  = FirebaseDatabase.getInstance()
+    private val database = FirebaseDatabase.getInstance()
     private val databaseRef = database.reference
     private val storage = FirebaseStorage.getInstance()
     private val storageReference = storage.reference
     private val userNode = databaseRef.child("Users")
-    private lateinit var onUser : ((User?) -> Unit)
-    private lateinit var userId : String
-
+    private lateinit var onUser: ((User?) -> Unit)
+    private lateinit var userId: String
 
 
     private val valueEventListener = object : ValueEventListener {
@@ -50,36 +49,33 @@ class AppDatabase private constructor(){
 
     //save user Image
     fun saveUserImage(imageUri: Uri, onSuccess: ((String) -> Unit)? = null) {
-                val ref = storageReference.child("uploads/" + UUID.randomUUID().toString())
-                val uploadTask = ref.putFile(imageUri)
+        val ref = storageReference.child("uploads/" + UUID.randomUUID().toString())
+        val uploadTask = ref.putFile(imageUri)
 
-                uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
-                    if (!task.isSuccessful) {
-                        task.exception?.let {
-                            throw it
-                        }
-                    }
-                    return@Continuation ref.downloadUrl
-                }).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val downloadUri = task.result
-                        onSuccess?.invoke(downloadUri.toString())
-                    } else {
-                        // Handle failures
-                    }
-                }.addOnFailureListener{
-                       // handle failure
+        uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
                 }
+            }
+            return@Continuation ref.downloadUrl
+        }).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val downloadUri = task.result
+                onSuccess?.invoke(downloadUri.toString())
+            } else {
+                // Handle failures
+            }
+        }.addOnFailureListener {
+            // handle failure
+        }
     }
-
-
 
 
     fun getUser(id: String, onUser: ((User?) -> Unit)) {
         this.onUser = onUser
         this.userId = id
         userNode.addValueEventListener(valueEventListener)
-
     }
 
     private fun close() {
@@ -87,6 +83,7 @@ class AppDatabase private constructor(){
     }
 
 
+    // Singleton implementation off databsae class
     companion object {
         private var appDatabase: AppDatabase? = null
 
