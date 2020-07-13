@@ -11,7 +11,8 @@ Droplet Development Task
 *   Implementation of android [MVVM Architecture Pattern](https://developer.android.com/jetpack/guide).
 *   Functional programming implementation by observing to data changes with [LiveData](https://codelabs.developers.google.com/codelabs/android-training-livedata-viewmodel/index.html#5).
 *   Using [ViewModel](https://codelabs.developers.google.com/codelabs/android-training-livedata-viewmodel/index.html#8) to serve as the bridge between datasource and UI. ViewModel implementation also makes sure data is not lost during configurations changes as its lifecycle aware.
-*   FireBase Real database implementation
+*   FireBase Realtime database implementation
+*   Dependency injection [Koin](https://start.insert-koin.io/#/introduction)
 
 ## Testing
 *   Android UI tests with [Espresso](https://developer.android.com/training/testing/espresso)
