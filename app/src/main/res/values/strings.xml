@@ -26,4 +26,7 @@
     <string name="view_null_exception">View is null please call attach method</string>
     <string name="loading_txt">Loading...</string>
     <string name="connection_txt">Please check internet connection</string>
+    <string name="upload_profile_image">Upload profile image</string>
+    <string name="change_profile_image">Update profile image</string>
+
 </resources>

@@ -9,13 +9,12 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.ScrollView
-import android.widget.Toast
+import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.PermissionChecker.PERMISSION_DENIED
@@ -50,11 +49,12 @@ class MainFragment : Fragment(), UserView {
     lateinit var firstNameTxt: EditText
     lateinit var lastNameTxt: EditText
     lateinit var emailTxt: EditText
+    lateinit var uploadTxt: TextView
 
     var imageUri: Uri? = null
     var signedInPhoneNumber: String? = null
     var signedInUserImage = ""
-    var menu : Menu? = null
+    var menu: Menu? = null
 
     val mUserViewModel: UserViewModel by viewModel()
 
@@ -65,6 +65,7 @@ class MainFragment : Fragment(), UserView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -94,7 +95,7 @@ class MainFragment : Fragment(), UserView {
         firstNameTxt = view.findViewById(R.id.first_name_txt)
         lastNameTxt = view.findViewById(R.id.last_name_txt)
         emailTxt = view.findViewById(R.id.email_txt)
-
+        uploadTxt = view.findViewById(R.id.upload_txt)
 
         imageView.setOnClickListener {
             showCaptureSelection()
@@ -106,14 +107,26 @@ class MainFragment : Fragment(), UserView {
         val fireBaseAuth = FirebaseAuth.getInstance()
         val firebaseUser = fireBaseAuth.currentUser
         if (firebaseUser != null) {
-            if (Utils.isNetworkAvailable()){
+            if (Utils.isNetworkAvailable()) {
                 //Already signed in
-                Utils.getLoadingInstance(requireContext()).show()
+
+                // this prevents a window exception when activity context does not exit to show
+                // dialog
+                try {
+                    Utils.getLoadingInstance(requireContext()).show()
+                } catch (e: WindowManager.BadTokenException) {
+                    Log.d(getString(R.string.app_name), e.toString())
+                }
+
                 signedInPhoneNumber = firebaseUser.phoneNumber
                 signedInPhoneNumber?.let { mUserViewModel.getProfile(it) }
                 showDetailsPage()
-            }else {
-                Toast.makeText(requireContext(), getString(R.string.connection_txt), Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.connection_txt),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         } else {
             // not signed in
@@ -237,9 +250,11 @@ class MainFragment : Fragment(), UserView {
 
                 showDetailsPage()
                 Log.d("Login", "Success")
+                return
             } else {
                 //Sign in failed
                 if (response == null) {
+                    showSplashPage()
                     // User Pressed back button
                     showSnackBar(
                         getString(R.string.sign_in_continue),
@@ -250,6 +265,11 @@ class MainFragment : Fragment(), UserView {
 
                 if (response.error?.errorCode == ErrorCodes.NO_NETWORK) {
                     // Network Error
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.connection_txt),
+                        Toast.LENGTH_LONG
+                    ).show()
                     return
                 }
 
@@ -267,6 +287,7 @@ class MainFragment : Fragment(), UserView {
         } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             val result = CropImage.getActivityResult(data)
             if (resultCode == Activity.RESULT_OK) {
+                uploadTxt.text = getString(R.string.change_profile_image)
                 imageUri = result.uri
                 Glide.with(this).load(imageUri).circleCrop().into(imageView)
             }
@@ -283,6 +304,7 @@ class MainFragment : Fragment(), UserView {
             val result = CropImage.getActivityResult(data)
             if (resultCode == Activity.RESULT_OK) {
                 //set image captured to image view
+                uploadTxt.text = getString(R.string.change_profile_image)
                 imageUri = result.uri
                 Glide.with(this).load(imageUri).circleCrop().into(imageView)
             }
@@ -314,8 +336,8 @@ class MainFragment : Fragment(), UserView {
 
     private fun showDetailsPage() {
         menu?.let {
-            val logoutItem  = it.findItem(R.id.sign_out)
-            val saveItem  = it.findItem(R.id.save)
+            val logoutItem = it.findItem(R.id.sign_out)
+            val saveItem = it.findItem(R.id.save)
             logoutItem.isVisible = true
             saveItem.isVisible = true
         }
@@ -327,8 +349,8 @@ class MainFragment : Fragment(), UserView {
 
     private fun showSplashPage() {
         menu?.let {
-            val logoutItem  = it.findItem(R.id.sign_out)
-            val saveItem  = it.findItem(R.id.save)
+            val logoutItem = it.findItem(R.id.sign_out)
+            val saveItem = it.findItem(R.id.save)
             logoutItem.isVisible = false
             saveItem.isVisible = false
         }
@@ -456,9 +478,12 @@ class MainFragment : Fragment(), UserView {
             lastNameTxt.setText(it.lastName)
             emailTxt.setText(it.email)
             signedInUserImage = it.image.toString()
-            if (!it.image?.isEmpty()!!)
+            if (!it.image?.isEmpty()!!) {
+                uploadTxt.text = getText(R.string.change_profile_image)
                 Glide.with(this).load(it.image).placeholder(R.drawable.ic_account_circle)
                     .circleCrop().into(imageView)
+            }
+
         }
     }
 
