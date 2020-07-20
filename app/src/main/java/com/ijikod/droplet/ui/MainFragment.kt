@@ -10,6 +10,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import android.widget.*
@@ -17,7 +19,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.PermissionChecker.PERMISSION_DENIED
 import androidx.core.content.PermissionChecker.checkSelfPermission
+import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
@@ -79,6 +84,7 @@ class MainFragment : Fragment(), UserView {
         val loginView = inflater.inflate(R.layout.fragment_login, container, false)
 
         initScreen(loginView)
+        initObservables()
 
         mUserViewModel.attachView(this, this)
         return loginView
@@ -95,9 +101,39 @@ class MainFragment : Fragment(), UserView {
         emailTxt = view.findViewById(R.id.email_txt)
         uploadTxt = view.findViewById(R.id.upload_txt)
 
+        emailTxt.doAfterTextChanged {
+            mUserViewModel.userEmail = it.toString()
+        }
+
+        firstNameTxt.doAfterTextChanged {
+            mUserViewModel.userFirstName = it.toString()
+        }
+
+        lastNameTxt.doAfterTextChanged {
+            mUserViewModel.lastName = it.toString()
+        }
+
         imageView.setOnClickListener {
             showCaptureSelection()
         }
+    }
+
+
+    private fun initObservables(){
+        // Set Email Error Messages
+        mUserViewModel.emailValidation.observe(viewLifecycleOwner, Observer {
+            if (it.isNotEmpty()) emailTxt.error = it
+        })
+
+        // set First Name Error Massage
+        mUserViewModel.firstNameValidation.observe(viewLifecycleOwner, Observer {
+            if (it.isNotEmpty()) firstNameTxt.error = it
+        })
+
+        // set First Name Error Massage
+        mUserViewModel.lastNameValidation.observe(viewLifecycleOwner, Observer {
+            if (it.isNotEmpty()) lastNameTxt.error = it
+        })
     }
 
     // Check for login instance of current User
@@ -206,7 +242,6 @@ class MainFragment : Fragment(), UserView {
                 requestPermissions(permission, Utils.CAPTURE_PERMISSION_CODE)
             } else {
                 //permission already granted
-
                 openCamera()
             }
         } else {
@@ -441,11 +476,8 @@ class MainFragment : Fragment(), UserView {
 
         // Save user details
         if (itemId == R.id.save) {
-            if (Utils.validatePage(
-                    firstName = firstNameTxt,
-                    lastName = lastNameTxt,
-                    email = emailTxt
-                )
+            if (firstNameTxt.error.isNullOrBlank() && lastNameTxt.error.isNullOrBlank()
+                && emailTxt.error.isNullOrBlank()
             ) {
                 Utils.getLoadingInstance(requireContext()).show()
                 if (imageUri == null) {
@@ -460,8 +492,15 @@ class MainFragment : Fragment(), UserView {
                         mUserViewModel.saveUserImage(it)
                     }
                 }
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.invalid_form_txt),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
+
         return super.onOptionsItemSelected(item)
     }
 
@@ -481,7 +520,6 @@ class MainFragment : Fragment(), UserView {
                 Glide.with(this).load(it.image).placeholder(R.drawable.ic_account_circle)
                     .circleCrop().into(imageView)
             }
-
         }
     }
 

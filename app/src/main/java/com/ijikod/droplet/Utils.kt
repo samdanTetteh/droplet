@@ -32,29 +32,6 @@ class Utils {
 
         private var dialog: Dialog? = null
 
-        //Validate values on details page
-        fun validatePage(firstName: EditText, lastName: EditText, email: EditText): Boolean {
-            var isPageValid = true
-            val patten = Patterns.EMAIL_ADDRESS
-
-            if (firstName.text.isEmpty()) {
-                firstName.error = DropletApp.appContext.getString(R.string.first_name_txt)
-                isPageValid = false
-            }
-
-            if (lastName.text.isEmpty()) {
-                lastName.error = DropletApp.appContext.getString(R.string.enter_last_name)
-                isPageValid = false
-            }
-
-            if (!patten.matcher(email.text.trim()).matches()) {
-                email.error = DropletApp.appContext.getString(R.string.valid_email_txt)
-                isPageValid = false
-            }
-
-            return isPageValid
-        }
-
         //loading dialog view
         fun getLoadingInstance(context: Context): Dialog {
             if (dialog == null)
