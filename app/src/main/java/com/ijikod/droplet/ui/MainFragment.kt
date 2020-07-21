@@ -19,17 +19,17 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.PermissionChecker.PERMISSION_DENIED
 import androidx.core.content.PermissionChecker.checkSelfPermission
-import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-import com.ijikod.droplet.Interface.UserView
 import com.ijikod.droplet.R
 import com.ijikod.droplet.Utils
 import com.ijikod.droplet.model.User
@@ -43,7 +43,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * Use the [MainFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class MainFragment : Fragment(), UserView {
+class MainFragment : Fragment() {
 
     lateinit var holder: CoordinatorLayout
     lateinit var detailsHolder: ScrollView
@@ -59,7 +59,7 @@ class MainFragment : Fragment(), UserView {
     var signedInUserImage = ""
     var menu: Menu? = null
 
-    val mUserViewModel: UserViewModel by viewModel()
+    private val mUserViewModel : UserViewModel by viewModel()
 
     companion object {
         fun newInstance() = MainFragment()
@@ -82,11 +82,8 @@ class MainFragment : Fragment(), UserView {
     ): View? {
         // Inflate the layout for this fragment
         val loginView = inflater.inflate(R.layout.fragment_login, container, false)
-
         initScreen(loginView)
         initObservables()
-
-        mUserViewModel.attachView(this, this)
         return loginView
     }
 
@@ -118,7 +115,7 @@ class MainFragment : Fragment(), UserView {
         }
     }
 
-
+    // Observing data changes in view model
     private fun initObservables(){
         // Set Email Error Messages
         mUserViewModel.emailValidation.observe(viewLifecycleOwner, Observer {
@@ -134,6 +131,23 @@ class MainFragment : Fragment(), UserView {
         mUserViewModel.lastNameValidation.observe(viewLifecycleOwner, Observer {
             if (it.isNotEmpty()) lastNameTxt.error = it
         })
+
+
+        mUserViewModel.isUserProfileSaved.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                hideLoadingDialog()
+                Toast.makeText(requireContext(), getString(R.string.user_saved_successfully), Toast.LENGTH_LONG).show()
+            }
+        })
+
+        mUserViewModel.isUserImageSaved.observe(viewLifecycleOwner, Observer {
+            saveUserDetails(it)
+        })
+
+        mUserViewModel.userProfileData.observe(viewLifecycleOwner, Observer {
+            showUserDetails(it)
+        })
+
     }
 
     // Check for login instance of current User
@@ -476,10 +490,8 @@ class MainFragment : Fragment(), UserView {
 
         // Save user details
         if (itemId == R.id.save) {
-            if (firstNameTxt.error.isNullOrBlank() && lastNameTxt.error.isNullOrBlank()
-                && emailTxt.error.isNullOrBlank()
-            ) {
-                Utils.getLoadingInstance(requireContext()).show()
+            if (firstNameTxt.error.isNullOrBlank() && lastNameTxt.error.isNullOrBlank() && emailTxt.error.isNullOrBlank()) {
+                showLoadingDialog()
                 if (imageUri == null) {
                     val user = User(firstName = firstNameTxt.text.toString())
                     user.lastName = lastNameTxt.text.toString().trim()
@@ -504,11 +516,17 @@ class MainFragment : Fragment(), UserView {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onUserSaved(success: Boolean) {
+    private fun hideLoadingDialog() {
         Utils.getLoadingInstance(requireContext()).hide()
     }
 
-    override fun onUser(user: User?) {
+
+    private fun showLoadingDialog(){
+        Utils.getLoadingInstance(requireContext()).show()
+    }
+
+    // Show [User] details after saved
+     private fun showUserDetails(user: User?) {
         Utils.getLoadingInstance(requireContext()).hide()
         user?.let {
             firstNameTxt.setText(it.firstName)
@@ -524,7 +542,7 @@ class MainFragment : Fragment(), UserView {
     }
 
     // Save user once image is successfully uploaded
-    override fun onUserImageSaved(image: String) {
+    private fun saveUserDetails(image: String) {
         val user = User(firstName = firstNameTxt.text.toString())
         user.lastName = lastNameTxt.text.toString().trim()
         user.email = emailTxt.text.toString().trim()

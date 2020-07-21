@@ -83,7 +83,7 @@ class AppDatabase private constructor() {
     }
 
 
-    // Singleton implementation off databsae class
+    // Singleton implementation off database class
     companion object {
         private var appDatabase: AppDatabase? = null
 

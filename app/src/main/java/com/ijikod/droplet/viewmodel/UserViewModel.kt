@@ -2,19 +2,13 @@ package com.ijikod.droplet.viewmodel
 
 import android.net.Uri
 import android.util.Patterns
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 import com.ijikod.droplet.Application.DropletApp
-import com.ijikod.droplet.Interface.UserView
 import com.ijikod.droplet.R
-import com.ijikod.droplet.base.BaseViewModel
 import com.ijikod.droplet.model.User
 import com.ijikod.droplet.repository.UserRepository
-import java.util.regex.Pattern
 
-class UserViewModel(private val mProfileRepository: UserRepository) : BaseViewModel<UserView>() {
+class UserViewModel(private val mProfileRepository: UserRepository) : ViewModel() {
 
 
     private val mMutableUserData = MutableLiveData<User?>()
@@ -26,8 +20,11 @@ class UserViewModel(private val mProfileRepository: UserRepository) : BaseViewMo
 
 
     val emailValidation = mEmailValidation
-    var firstNameValidation = mFirstNameValidation
-    var lastNameValidation = mLastNameValidation
+    val firstNameValidation = mFirstNameValidation
+    val lastNameValidation = mLastNameValidation
+    val isUserProfileSaved = mProfileUserSaved
+    val isUserImageSaved = mUserImageSaved
+    val userProfileData = mMutableUserData
 
     var userEmail = ""
       set(value) {
@@ -42,16 +39,6 @@ class UserViewModel(private val mProfileRepository: UserRepository) : BaseViewMo
     var lastName = ""
     set(value) {
         validUserLastName(value)
-    }
-
-    private val mUserObserver: Observer<in User?> = Observer {
-        getView().onUser(it)
-    }
-    private val mUserDataUpdateObserver: Observer<in Boolean> = Observer {
-        getView().onUserSaved(it)
-    }
-    private val mUserImageUploadObserver: Observer<in String> = Observer {
-        getView().onUserImageSaved(it)
     }
 
     fun getProfile(id: String) {
@@ -122,22 +109,5 @@ class UserViewModel(private val mProfileRepository: UserRepository) : BaseViewMo
             }
         }
         return lastNameValidation
-    }
-
-    override fun attachView(view: UserView, lifecycleOwner: LifecycleOwner) {
-        super.attachView(view, lifecycleOwner)
-
-        mMutableUserData.observe(lifecycleOwner, mUserObserver)
-
-        mProfileUserSaved.observe(lifecycleOwner, mUserDataUpdateObserver)
-
-        mUserImageSaved.observe(lifecycleOwner, mUserImageUploadObserver)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        mMutableUserData.removeObserver(mUserObserver)
-        mProfileUserSaved.removeObserver(mUserDataUpdateObserver)
-        mUserImageSaved.removeObserver(mUserImageUploadObserver)
     }
 }

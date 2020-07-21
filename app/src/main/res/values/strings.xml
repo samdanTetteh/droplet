@@ -32,5 +32,6 @@
     <string name="upload_profile_image">Upload profile image</string>
     <string name="change_profile_image">Update profile image</string>
     <string name="invalid_form_txt">Invalid Form Details</string>
+    <string name="user_saved_successfully">User Details Saved Successfully</string>
 
 </resources>
