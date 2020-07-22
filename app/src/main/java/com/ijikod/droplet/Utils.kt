@@ -20,6 +20,9 @@ class Utils {
         // Arbitrary request code value
         const val RC_SIGN_IN = 123
 
+        // dialogFragment request code
+        const val FRAGMENT_REQUEST = 456
+
         //image pick code
         const val IMAGE_PICK_CODE = 1000;
 
